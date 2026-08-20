@@ -1,9 +1,9 @@
 {
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ./frontend/",
   "services": {
     "frontend": {
       "root": "frontend",
       "framework": "vite",
+      "ignoreCommand": "git diff --quiet HEAD^ HEAD -- ./frontend/",
       "rewrites": [
         { "source": "/(.*)", "destination": "/index.html" }
       ]
@@ -12,10 +12,7 @@
   "rewrites": [
     {
       "source": "/(.*)",
-      "destination": {
-        "type": "service",
-        "service": "frontend"
-      }
+      "destination": { "service": "frontend" }
     }
   ]
 }
