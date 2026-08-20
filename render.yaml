@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: hotel-ai-assistant
+    name: ai-staff-copilot
     runtime: python
     rootDir: backend
     buildCommand: pip install -r requirements.txt
@@ -8,7 +8,7 @@ services:
     healthCheckPath: /health
     envVars:
       - key: PYTHON_VERSION
-        value: "3.13.4"
+        value: "3.12.8"
       - key: OPENAI_API_KEY
         sync: false
       - key: LANGSMITH_API_KEY

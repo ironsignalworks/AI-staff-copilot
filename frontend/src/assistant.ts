@@ -102,7 +102,7 @@ export const DEFAULT_ASSISTANT_RESULT: AssistantResult = {
   pipeline: POLICY_PIPELINE,
 }
 
-const RENDER_API_URL = 'https://hotel-ai-assistant.onrender.com'
+const RENDER_API_URL = 'https://ai-staff-copilot.onrender.com'
 
 export function getApiBaseUrl(): string {
   const configured = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '')

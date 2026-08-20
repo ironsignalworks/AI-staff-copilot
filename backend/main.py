@@ -1,11 +1,12 @@
 from contextlib import asynccontextmanager
 from pathlib import Path
+import threading
 
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from mcp_client import McpGateway, get_gateway, set_gateway
+from mcp_client import McpGateway, get_gateway, peek_gateway, set_gateway
 from models import AssistantQueryResponse
 from pipeline import run_assistant_pipeline
 from tracing import load_dotenv, tracing_enabled, tracing_mode
@@ -26,19 +27,24 @@ class SopDocumentResponse(BaseModel):
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    """Boot MCP in the background so uvicorn can bind and pass Render health checks."""
     gateway = McpGateway()
-    try:
-        gateway.start()
-        set_gateway(gateway)
-    except Exception:
-        set_gateway(None)
-        gateway = None
+    # Publish immediately so callers share one instance; ready stays false until start().
+    set_gateway(gateway)
+
+    def _boot_mcp() -> None:
+        try:
+            gateway.start()
+        except Exception:
+            set_gateway(None)
+
+    boot = threading.Thread(target=_boot_mcp, name="mcp-boot", daemon=True)
+    boot.start()
     try:
         yield
     finally:
-        if gateway is not None:
-            gateway.stop()
-            set_gateway(None)
+        gateway.stop()
+        set_gateway(None)
 
 
 app = FastAPI(title="AI Staff Copilot API", version="1.0.0", lifespan=lifespan)
@@ -64,18 +70,27 @@ app.add_middleware(
 
 @app.get("/health")
 def health() -> dict[str, object]:
-    mcp_status = "degraded"
+    # Never call get_gateway() here — starting MCP is slow and must not block
+    # Render's liveness probe (that pattern produces deploy-time 502s).
+    mcp_status = "starting"
     sop_index_status = "unavailable"
 
-    try:
-        gateway = get_gateway()
-        if gateway.ping():
-            mcp_status = "ok"
-            uris = gateway.list_resource_uris()
-            sop_index_status = "ready" if uris else "unavailable"
-    except Exception:
+    gateway = peek_gateway()
+    if gateway is None:
         mcp_status = "degraded"
-        sop_index_status = "unavailable"
+    elif not gateway.ready:
+        mcp_status = "starting"
+    else:
+        try:
+            if gateway.ping():
+                mcp_status = "ok"
+                uris = gateway.list_resource_uris()
+                sop_index_status = "ready" if uris else "unavailable"
+            else:
+                mcp_status = "degraded"
+        except Exception:
+            mcp_status = "degraded"
+            sop_index_status = "unavailable"
 
     return {
         "status": "ok" if mcp_status == "ok" and sop_index_status == "ready" else "degraded",

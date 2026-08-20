@@ -16,6 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 MCP_SERVER_SCRIPT = REPO_ROOT / "mcp_server" / "server.py"
 
 _gateway: McpGateway | None = None
+_gateway_lock = threading.Lock()
 
 
 class McpGateway:
@@ -63,7 +64,8 @@ class McpGateway:
     def start(self, timeout: float = 20) -> None:
         if self._started:
             return
-        self._thread.start()
+        if not self._thread.is_alive():
+            self._thread.start()
         if not self._ready.wait(timeout=timeout):
             raise TimeoutError("MCP gateway did not become ready.")
         if self._connect_error is not None:
@@ -71,11 +73,14 @@ class McpGateway:
         self._started = True
 
     def stop(self) -> None:
-        if not self._started:
-            return
         self._stop.set()
-        self._thread.join(timeout=10)
+        if self._thread.is_alive():
+            self._thread.join(timeout=10)
         self._started = False
+
+    @property
+    def ready(self) -> bool:
+        return self._started and self._session is not None
 
     def _call(self, coro: Any, timeout: float = 15) -> Any:
         future = asyncio.run_coroutine_threadsafe(coro, self._loop)
@@ -150,12 +155,21 @@ def _coerce_match_list(payload: Any) -> list[dict[str, Any]] | None:
 
 def set_gateway(gateway: McpGateway | None) -> None:
     global _gateway
-    _gateway = gateway
+    with _gateway_lock:
+        _gateway = gateway
+
+
+def peek_gateway() -> McpGateway | None:
+    """Return the live gateway without starting a new MCP subprocess."""
+    return _gateway
 
 
 def get_gateway() -> McpGateway:
     global _gateway
-    if _gateway is None:
-        _gateway = McpGateway()
-        _gateway.start()
-    return _gateway
+    with _gateway_lock:
+        if _gateway is not None and _gateway.ready:
+            return _gateway
+        gateway = _gateway if _gateway is not None else McpGateway()
+        _gateway = gateway
+    gateway.start()
+    return gateway
