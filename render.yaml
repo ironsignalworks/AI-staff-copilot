@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: hotel-ai-assistant
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.13.4"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: LANGSMITH_API_KEY
+        sync: false
+      - key: LANGCHAIN_API_KEY
+        sync: false
+      - key: LANGSMITH_TRACING
+        value: "true"
+      - key: LANGCHAIN_TRACING_V2
+        value: "true"
+      - key: LANGSMITH_PROJECT
+        value: ai-staff-copilot
+      - key: LANGCHAIN_PROJECT
+        value: ai-staff-copilot

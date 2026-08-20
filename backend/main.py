@@ -43,9 +43,19 @@ async def lifespan(_app: FastAPI):
 
 app = FastAPI(title="AI Staff Copilot API", version="1.0.0", lifespan=lifespan)
 
+# Enforce secure origins while allowing local developer loops.
+# Step 1 keeps a wildcard so Render ↔ Vercel traffic can be validated;
+# switch allow_origins to `origins` once the new hosts are stable.
+origins = [
+    "https://ai-staff-copilot.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["X-Request-ID"],

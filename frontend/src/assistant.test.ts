@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { normalizeQuery, parseAssistantResponse } from './assistant'
+import { getApiBaseUrl, normalizeQuery, parseAssistantResponse } from './assistant'
+
+describe('getApiBaseUrl', () => {
+  it('keeps the Vite proxy in local development when VITE_API_URL is unset', () => {
+    expect(getApiBaseUrl()).toBe('')
+  })
+})
 
 describe('normalizeQuery', () => {
   it('trims and collapses whitespace', () => {

@@ -102,11 +102,16 @@ export const DEFAULT_ASSISTANT_RESULT: AssistantResult = {
   pipeline: POLICY_PIPELINE,
 }
 
+const RENDER_API_URL = 'https://hotel-ai-assistant.onrender.com'
+
 export function getApiBaseUrl(): string {
   const configured = (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '')
   if (configured) return configured
+
+  // Retain the Vite local proxy for uvicorn debugging.
   if (import.meta.env.DEV) return ''
-  return 'http://127.0.0.1:8000'
+
+  return RENDER_API_URL
 }
 
 function isStringArray(value: unknown): value is string[] {
