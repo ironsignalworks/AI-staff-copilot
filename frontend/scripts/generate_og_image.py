@@ -1,4 +1,4 @@
-"""Generate the 1200x630 Open Graph card for Hotel Operations AI Assistant."""
+"""Generate the 1200x630 Open Graph card for AI Staff Copilot."""
 
 from __future__ import annotations
 
@@ -107,7 +107,7 @@ def draw_dashboard(base: Image.Image, origin: tuple[int, int]) -> None:
             rounded_rect(d, box, 10, fill=(22, 40, 62), outline=(29, 50, 74), width=2)
         d.text((32, y + 14), label, font=font(FONT_UI, 22), fill=ICE)
 
-    nav(138, "Assistant", True)
+    nav(138, "Copilot", True)
     nav(200, "SOP Manual")
     nav(262, "System Monitor")
 
@@ -118,7 +118,7 @@ def draw_dashboard(base: Image.Image, origin: tuple[int, int]) -> None:
         d.ellipse((200, yy + 8, 218, yy + 26), fill=GREEN)
 
     # Main content
-    d.text((278, 100), "AI HOSPITALITY ASSISTANT", font=font(FONT_UI_BOLD, 28), fill=INK)
+    d.text((278, 100), "AI STAFF COPILOT", font=font(FONT_UI_BOLD, 28), fill=INK)
 
     def panel(box: tuple[int, int, int, int], title: str) -> None:
         rounded_rect(d, box, 16, fill=PANEL, outline=PANEL_BORDER, width=2)
@@ -129,9 +129,9 @@ def draw_dashboard(base: Image.Image, origin: tuple[int, int]) -> None:
     d.text((308, 228), "Can room 302 have late", font=font(FONT_UI, 20), fill=INK)
     d.text((308, 258), "checkout until 3pm?", font=font(FONT_UI, 20), fill=INK)
     rounded_rect(d, (294, 392, 488, 444), 10, fill=BTN_BG, outline=(53, 101, 154), width=2)
-    d.text((312, 404), "Ask Assistant", font=font(FONT_UI_BOLD, 18), fill=BTN)
+    d.text((312, 404), "Ask Copilot", font=font(FONT_UI_BOLD, 18), fill=BTN)
 
-    panel((628, 156, 952, 560), "ASSISTANT RESPONSE")
+    panel((628, 156, 952, 560), "COPILOT RESPONSE")
     d.rounded_rectangle((648, 210, 932, 520), 10, fill=(244, 250, 247), outline=(186, 214, 198), width=2)
     d.text((664, 226), "POLICY FOUND", font=font(FONT_MONO_BOLD, 18), fill=(22, 128, 72))
     d.text((664, 268), "Late checkout until 13:00", font=font(FONT_UI, 18), fill=INK)
@@ -186,8 +186,8 @@ def main() -> None:
     footer_f = font(FONT_UI, 28)
 
     draw.text((96, 92), "HOTEL // OPERATIONS", font=eyebrow, fill=STEEL)
-    draw.text((92, 210), "AI HOSPITALITY", font=title, fill=WHITE)
-    draw.text((92, 322), "ASSISTANT", font=title, fill=WHITE)
+    draw.text((92, 210), "AI STAFF", font=title, fill=WHITE)
+    draw.text((92, 322), "COPILOT", font=title, fill=WHITE)
 
     x = 96
     for label in ("LangGraph", "MCP", "FastAPI", "Pydantic"):

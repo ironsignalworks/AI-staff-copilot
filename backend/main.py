@@ -41,7 +41,7 @@ async def lifespan(_app: FastAPI):
             set_gateway(None)
 
 
-app = FastAPI(title="Hotel AI Assistant API", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="AI Staff Copilot API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

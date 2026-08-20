@@ -1,7 +1,7 @@
 {
-  "name": "Hotel Operations AI Assistant",
-  "short_name": "Hotel Ops",
-  "description": "AI-powered hotel operations assistant with LangGraph, MCP, SOP retrieval, and structured guardrails.",
+  "name": "AI Staff Copilot",
+  "short_name": "Staff Copilot",
+  "description": "AI staff copilot with LangGraph, MCP, SOP retrieval, and structured guardrails.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#111827",

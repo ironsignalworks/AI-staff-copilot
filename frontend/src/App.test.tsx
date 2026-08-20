@@ -57,8 +57,8 @@ describe('App', () => {
     const field = screen.getByLabelText(/front desk query/i)
     expect(field.tagName).toBe('TEXTAREA')
     expect(field.closest('form')).not.toBeNull()
-    expect(screen.getByRole('button', { name: /ask assistant/i })).toHaveAttribute('type', 'submit')
-    expect(screen.getByRole('heading', { level: 1, name: /ai hospitality assistant/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /ask copilot/i })).toHaveAttribute('type', 'submit')
+    expect(screen.getByRole('heading', { level: 1, name: /ai staff copilot/i })).toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 2, name: /front desk query/i })).toBeInTheDocument()
   })
 

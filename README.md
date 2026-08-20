@@ -1,6 +1,6 @@
-# Hotel Operations AI Assistant
+# AI Staff Copilot
 
-Front-desk assistant that answers hotel policy questions from approved SOP manuals. Retrieval is isolated behind [MCP](https://modelcontextprotocol.io/), so the agent reasons over policy context instead of inventing it.
+Front-desk copilot that answers hotel policy questions from approved SOP manuals. Retrieval is isolated behind [MCP](https://modelcontextprotocol.io/), so the agent reasons over policy context instead of inventing it.
 
 [View Architecture Documentation](./docs/adr/ARCHITECTURE.md)
 
@@ -10,12 +10,12 @@ Front-desk assistant that answers hotel policy questions from approved SOP manua
 - Refusal when no relevant policy is found (no invented rules)
 - PII masking for emails and phone numbers before the graph runs
 - Per-request pipeline receipt (request ID, timestamp, retrieved documents, tracing mode)
-- Operations UI: assistant, SOP browser, and system monitor
+- Operations UI: copilot, SOP browser, and system monitor
 - Opt-in LangSmith tracing; local receipts still appear without credentials
 
 ## Screenshots
 
-### Assistant
+### Copilot
 
 ![Front-desk query screen with system health](./docs/screenshots/assistant.png)
 
@@ -122,7 +122,7 @@ Never commit `.env` files or production credentials.
 | `API_URL` | Backend origin used by local tooling |
 | `LANGSMITH_TRACING` / `LANGCHAIN_TRACING_V2` | Enable LangSmith when `true` |
 | `LANGSMITH_API_KEY` / `LANGCHAIN_API_KEY` | LangSmith API key |
-| `LANGSMITH_PROJECT` / `LANGCHAIN_PROJECT` | Trace project name (default `hotel-ai-assistant`) |
+| `LANGSMITH_PROJECT` / `LANGCHAIN_PROJECT` | Trace project name (default `ai-staff-copilot`) |
 | `OPENAI_API_KEY` | Reserved; answers are currently extracted from SOP text, not an LLM |
 | `MCP_SERVER_URL` | Reserved; the live path uses stdio, not HTTP |
 

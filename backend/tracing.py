@@ -35,7 +35,7 @@ def tracing_project() -> str:
     return (
         os.getenv("LANGSMITH_PROJECT")
         or os.getenv("LANGCHAIN_PROJECT")
-        or "hotel-ai-assistant"
+        or "ai-staff-copilot"
     )
 
 

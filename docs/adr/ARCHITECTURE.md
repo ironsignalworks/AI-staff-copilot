@@ -1,6 +1,6 @@
 # Architecture
 
-Hotel Operations AI Assistant answers front-desk policy questions from a closed SOP corpus. The LLM-facing contract is: **reason over retrieved hotel policy; do not invent hotel policy.**
+AI Staff Copilot answers front-desk policy questions from a closed SOP corpus. The LLM-facing contract is: **reason over retrieved hotel policy; do not invent hotel policy.**
 
 This document describes the running system. Setup and commands live in the [README](../../README.md). Decision records are in this folder: [`docs/adr/`](./).
 

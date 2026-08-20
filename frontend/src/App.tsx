@@ -238,7 +238,7 @@ function App() {
     ['Tracing', tracingOnline ? 'ok' : 'warn'],
   ]
   const screens = [
-    ['assistant', HiOutlineSparkles, 'Assistant'],
+    ['assistant', HiOutlineSparkles, 'Copilot'],
     ['sop', HiOutlineBookOpen, 'SOP Manual'],
     ['monitor', HiOutlineCpuChip, 'System Monitor'],
   ] as const
@@ -289,7 +289,7 @@ function App() {
         <main className="content">
           {screen === 'assistant' ? (
             <>
-              <h1>AI HOSPITALITY ASSISTANT</h1>
+              <h1>AI STAFF COPILOT</h1>
               <div className="two-col">
                 <Panel title="FRONT DESK QUERY">
                   <p className="philosophy">
@@ -327,13 +327,13 @@ function App() {
                     </div>
                     <button className="primary-button" type="submit" disabled={!query.trim() || isLoading}>
                       <HiOutlinePaperAirplane />
-                      {isLoading ? 'Asking...' : 'Ask Assistant'}
+                      {isLoading ? 'Asking...' : 'Ask Copilot'}
                     </button>
                   </form>
                   {requestError ? <p className="error-text">{requestError}</p> : null}
                 </Panel>
 
-                <Panel title="ASSISTANT RESPONSE">
+                <Panel title="COPILOT RESPONSE">
                   {assistantResult ? (
                     <div>
                       <div className="result-heading">
