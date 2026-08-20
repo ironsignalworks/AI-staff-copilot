@@ -3,7 +3,7 @@ services:
     name: ai-staff-copilot
     runtime: python
     rootDir: backend
-    buildCommand: python -m pip install --upgrade pip && python -m pip install -r requirements.txt
+    buildCommand: cp -r ../mcp_server . && python -m pip install --upgrade pip && python -m pip install -r requirements.txt
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:

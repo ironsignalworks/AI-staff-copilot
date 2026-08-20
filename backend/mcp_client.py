@@ -12,8 +12,13 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-MCP_SERVER_SCRIPT = REPO_ROOT / "mcp_server" / "server.py"
+BACKEND_DIR = Path(__file__).resolve().parent
+REPO_ROOT = BACKEND_DIR.parent
+# Prefer the in-sandbox copy Render's build command places next to main.py;
+# fall back to the repo-root package for local development.
+_LOCAL_MCP = BACKEND_DIR / "mcp_server" / "server.py"
+_REPO_MCP = REPO_ROOT / "mcp_server" / "server.py"
+MCP_SERVER_SCRIPT = _LOCAL_MCP if _LOCAL_MCP.is_file() else _REPO_MCP
 
 _gateway: McpGateway | None = None
 _gateway_lock = threading.Lock()
