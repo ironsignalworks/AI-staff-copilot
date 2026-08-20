@@ -13,6 +13,28 @@ Front-desk assistant that answers hotel policy questions from approved SOP manua
 - Operations UI: assistant, SOP browser, and system monitor
 - Opt-in LangSmith tracing; local receipts still appear without credentials
 
+## Screenshots
+
+### Assistant
+
+![Front-desk query screen with system health](./docs/screenshots/assistant.png)
+
+### Grounded answer
+
+![Policy answer with SOP context and request receipt](./docs/screenshots/assistant-answer.png)
+
+### Policy not found
+
+![Grounded refusal when no SOP covers llamas in the presidential suite](./docs/screenshots/policy-not-found.png)
+
+### SOP Manual
+
+![SOP browser with late checkout policy open](./docs/screenshots/sop-manual.png)
+
+### System Monitor
+
+![Per-request pipeline execution](./docs/screenshots/system-monitor.png)
+
 ## Stack
 
 | Layer | Technology |
@@ -26,9 +48,10 @@ Front-desk assistant that answers hotel policy questions from approved SOP manua
 
 ## Requirements
 
-- Python 3.11+
-- Node.js 20+
-- npm
+- **Backend / MCP:** Python 3.11+ (FastAPI, LangGraph, MCP server)
+- **Frontend:** Node.js 20+ and npm (Vite + React UI only)
+
+The API itself does not use Node.js. Skip the Node install if you only run `uvicorn`.
 
 ## Local development
 
@@ -144,6 +167,7 @@ mcp_server/sop_manuals/  Markdown hotel policies
 frontend/                Operations UI
 docs/adr/ARCHITECTURE.md System design
 docs/adr/                Architecture decision records
+docs/screenshots/        README UI captures
 ```
 
 ## License
