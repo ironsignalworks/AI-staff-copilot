@@ -48,6 +48,26 @@ def tracing_mode() -> str:
     return "langsmith" if tracing_enabled() else "local"
 
 
+def langgraph_config() -> dict[str, Any]:
+    """LangGraph invoke config with a native LangSmith tracer when enabled."""
+    if not tracing_enabled():
+        return {}
+
+    try:
+        from langchain_core.tracers import LangChainTracer
+        from langsmith import Client
+    except ImportError:
+        return {}
+
+    try:
+        client = Client(api_key=tracing_api_key())
+        tracer = LangChainTracer(project_name=tracing_project(), client=client)
+        return {"callbacks": [tracer]}
+    except Exception:
+        # Tracing must never fail the guest-facing answer path.
+        return {}
+
+
 def emit_langsmith_run(
     *,
     run_id: str,

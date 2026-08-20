@@ -6,6 +6,7 @@ from langgraph.graph import END, START, StateGraph
 
 from mcp_client import get_gateway
 from models import PipelineStep, RetrievedDocument
+from tracing import langgraph_config
 
 
 MIN_RELEVANCE_SCORE = 6
@@ -188,4 +189,6 @@ def run_langgraph(masked_query: str, pipeline: list[PipelineStep]) -> GraphState
         "retrieved_documents": [],
         "pipeline": [step.model_dump() for step in pipeline],
     }
-    return assistant_graph.invoke(initial)
+    # Native LangSmith tracer must be passed explicitly on invoke.
+    config = langgraph_config()
+    return assistant_graph.invoke(initial, config=config)
