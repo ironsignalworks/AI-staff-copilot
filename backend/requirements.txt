@@ -1,0 +1,5 @@
+fastapi
+uvicorn
+mcp<2
+langgraph
+pytest
