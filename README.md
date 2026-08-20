@@ -2,6 +2,8 @@
 
 Front-desk copilot that answers hotel policy questions from approved SOP manuals. Retrieval is isolated behind [MCP](https://modelcontextprotocol.io/), so the agent reasons over policy context instead of inventing it.
 
+**Live demo:** [https://ai-staff-copilot.vercel.app/](https://ai-staff-copilot.vercel.app/)
+
 [View Architecture Documentation](./docs/adr/ARCHITECTURE.md)
 
 ## Features
@@ -17,11 +19,11 @@ Front-desk copilot that answers hotel policy questions from approved SOP manuals
 
 ### Copilot
 
-![Front-desk query screen with system health](./docs/screenshots/assistant.png)
+![Front-desk query screen with system health](./docs/screenshots/copilot.png)
 
 ### Grounded answer
 
-![Policy answer with SOP context and request receipt](./docs/screenshots/assistant-answer.png)
+![Policy answer with SOP context and request receipt](./docs/screenshots/copilot-answer.png)
 
 ### Policy not found
 
@@ -118,7 +120,7 @@ Never commit `.env` files or production credentials.
 | Variable | Purpose |
 | --- | --- |
 | `VITE_API_URL` | Backend origin for the frontend (dev default: Vite proxy) |
-| `VITE_SITE_URL` | Public origin for Open Graph / canonical URLs |
+| `VITE_SITE_URL` | Public origin for Open Graph / canonical URLs (production: `https://ai-staff-copilot.vercel.app`) |
 | `API_URL` | Backend origin used by local tooling |
 | `LANGSMITH_TRACING` / `LANGCHAIN_TRACING_V2` | Enable LangSmith when `true` |
 | `LANGSMITH_API_KEY` / `LANGCHAIN_API_KEY` | LangSmith API key |
