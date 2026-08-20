@@ -88,7 +88,7 @@
 
 .nav-heading,
 .eyebrow {
-  color: #708397;
+  color: #3e5a6f;
   font: 700 10px var(--font-mono);
   letter-spacing: 0.13em;
 }
@@ -135,7 +135,7 @@
 }
 
 .health-row span:last-child {
-  color: #678096;
+  color: #3e5a6f;
 }
 
 .content {
@@ -207,7 +207,7 @@ kbd {
   border-radius: 4px;
   background: #f3f7fa;
   padding: 3px 6px;
-  color: #7b8e9e;
+  color: #49657b;
   font: 10px var(--font-mono);
   text-transform: none;
 }
@@ -271,7 +271,7 @@ button:focus-visible {
 .try-asking > span {
   display: block;
   margin: 0 0 8px;
-  color: #7890a2;
+  color: #3e5a6f;
   font: 700 10px var(--font-mono);
   letter-spacing: 0.12em;
 }
@@ -290,7 +290,7 @@ button:focus-visible {
   justify-content: center;
   gap: 10px;
   padding-top: 21px;
-  color: #7890a2;
+  color: #526d82;
   text-align: center;
   font-size: 13px;
 }
@@ -302,12 +302,12 @@ button:focus-visible {
 .empty-state svg {
   width: 25px;
   height: 25px;
-  color: #8aa4b8;
+  color: #4a6278;
 }
 
 .empty-state span {
   margin-top: 12px;
-  color: #7890a2;
+  color: #3e5a6f;
   font: 700 10px var(--font-mono);
   letter-spacing: 0.12em;
 }
@@ -368,7 +368,7 @@ button:focus-visible {
   align-items: center;
   gap: 7px;
   margin: 16px 0 0;
-  color: #70879a;
+  color: #526d82;
   font-size: 11px;
 }
 
@@ -386,7 +386,7 @@ button:focus-visible {
 .muted-line {
   margin: 0;
   padding: 21px 0;
-  color: #8396a6;
+  color: #526d82;
   font-size: 12px;
 }
 
@@ -413,7 +413,7 @@ button:focus-visible {
 .retrieved > .eyebrow {
   display: block;
   margin: 0;
-  color: #7b8e9e;
+  color: #49657b;
   font: 700 9px var(--font-mono);
   letter-spacing: 0.1em;
   text-transform: uppercase;
@@ -442,7 +442,7 @@ button:focus-visible {
 }
 
 .retrieved-row span {
-  color: #8093a3;
+  color: #526d82;
 }
 
 .execution-drawer {
@@ -515,7 +515,7 @@ button:focus-visible {
 
 .pipeline-step p {
   margin: 4px 0 0;
-  color: #7890a2;
+  color: #526d82;
   font-size: 11px;
 }
 

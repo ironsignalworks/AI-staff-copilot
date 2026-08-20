@@ -87,7 +87,7 @@ function Panel({
 }) {
   return (
     <article className={`panel ${className}`.trim()}>
-      <h3 className="panel-title">{title}</h3>
+      <h2 className="panel-title">{title}</h2>
       <div className="panel-body">{children}</div>
     </article>
   )

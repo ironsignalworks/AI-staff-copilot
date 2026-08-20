@@ -58,6 +58,8 @@ describe('App', () => {
     expect(field.tagName).toBe('TEXTAREA')
     expect(field.closest('form')).not.toBeNull()
     expect(screen.getByRole('button', { name: /ask assistant/i })).toHaveAttribute('type', 'submit')
+    expect(screen.getByRole('heading', { level: 1, name: /ai hospitality assistant/i })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level: 2, name: /front desk query/i })).toBeInTheDocument()
   })
 
   it('renders a custom 404 for unknown routes', () => {
