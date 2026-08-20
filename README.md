@@ -2,7 +2,7 @@
 
 Front-desk assistant that answers hotel policy questions from approved SOP manuals. Retrieval is isolated behind [MCP](https://modelcontextprotocol.io/), so the agent reasons over policy context instead of inventing it.
 
-[View Architecture Documentation](./docs/ARCHITECTURE.md)
+[View Architecture Documentation](./docs/adr/ARCHITECTURE.md)
 
 ## Features
 
@@ -142,7 +142,7 @@ backend/                 FastAPI app, LangGraph graph, MCP client
 mcp_server/              MCP resources + search_sop_manuals
 mcp_server/sop_manuals/  Markdown hotel policies
 frontend/                Operations UI
-docs/ARCHITECTURE.md     System design
+docs/adr/ARCHITECTURE.md System design
 docs/adr/                Architecture decision records
 ```
 

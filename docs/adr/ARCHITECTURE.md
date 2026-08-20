@@ -2,7 +2,7 @@
 
 Hotel Operations AI Assistant answers front-desk policy questions from a closed SOP corpus. The LLM-facing contract is: **reason over retrieved hotel policy; do not invent hotel policy.**
 
-This document describes the running system. Setup and commands live in the [README](../README.md). Decision records are in [`docs/adr/`](adr/).
+This document describes the running system. Setup and commands live in the [README](../../README.md). Decision records are in this folder: [`docs/adr/`](./).
 
 ## System overview
 
@@ -143,7 +143,7 @@ Empty queries return `[]`. Ranking keeps the top five documents.
 
 ### Search strategy
 
-Keyword retrieval by design ([ADR-003](adr/003-keyword-retrieval-first.md)):
+Keyword retrieval by design ([ADR-003](./003-keyword-retrieval-first.md)):
 
 ```text
 query
@@ -218,9 +218,9 @@ Not in place:
 
 | Choice | Why |
 | --- | --- |
-| MCP boundary | Agent depends on a tool/resource contract, not filesystem paths ([ADR-001](adr/001-mcp-boundary.md)). |
-| Markdown SOP files | Human-readable, version-controlled, no database required ([ADR-002](adr/002-markdown-sop-files.md)). |
-| Keyword search first | Deterministic tests and a stable tool API before embeddings ([ADR-003](adr/003-keyword-retrieval-first.md)). |
+| MCP boundary | Agent depends on a tool/resource contract, not filesystem paths ([ADR-001](./001-mcp-boundary.md)). |
+| Markdown SOP files | Human-readable, version-controlled, no database required ([ADR-002](./002-markdown-sop-files.md)). |
+| Keyword search first | Deterministic tests and a stable tool API before embeddings ([ADR-003](./003-keyword-retrieval-first.md)). |
 | Extractive answers | Output is taken from retrieved SOP lines so the model cannot invent policy on the current path. |
 | stdio MCP from FastAPI | Same process tree as the API; no extra HTTP MCP service in local or Vercel runs. |
 
