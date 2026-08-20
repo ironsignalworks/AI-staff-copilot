@@ -1,9 +1,20 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { HiOutlineBookOpen, HiOutlineCpuChip, HiOutlineSparkles } from 'react-icons/hi2'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import {
+  HiOutlineBookOpen,
+  HiOutlineChartBar,
+  HiOutlineCheck,
+  HiOutlineChevronDown,
+  HiOutlineChevronRight,
+  HiOutlineCpuChip,
+  HiOutlineDocumentText,
+  HiOutlineExclamationTriangle,
+  HiOutlinePaperAirplane,
+  HiOutlineSparkles,
+  HiOutlineXMark,
+} from 'react-icons/hi2'
 import {
   callAssistantApi,
   callSopDocumentApi,
-  DEFAULT_ASSISTANT_RESULT,
   DEMO_QUESTIONS,
   formatTimestamp,
   getApiBaseUrl,
@@ -42,17 +53,43 @@ function PipelineList({ steps }: { steps: PipelineStep[] }) {
   return (
     <ol className="pipeline">
       {steps.map((step) => (
-        <li key={step.label}>
-          <div className="pipeline-row">
-            <span className="pipeline-label">{step.label}</span>
-            <span className={step.status === 'ok' ? 'pipeline-status' : 'pipeline-status warn'}>
-              {step.status === 'ok' ? '✓ OK' : step.status === 'skip' ? 'SKIP' : '⚠ CHECK'}
-            </span>
+        <li className="pipeline-step" key={step.label}>
+          <div className={`step-status ${step.status}`}>
+            {step.status === 'ok' ? (
+              <HiOutlineCheck />
+            ) : step.status === 'warn' ? (
+              <HiOutlineExclamationTriangle />
+            ) : (
+              <HiOutlineXMark />
+            )}
           </div>
-          <p>{step.detail}</p>
+          <div>
+            <strong>{step.label}</strong>
+            <p>{step.detail}</p>
+          </div>
+          <span className={`status-text ${step.status}`}>
+            {step.status === 'ok' ? 'OK' : step.status === 'warn' ? 'CHECK' : 'SKIP'}
+          </span>
         </li>
       ))}
     </ol>
+  )
+}
+
+function Panel({
+  title,
+  children,
+  className = '',
+}: {
+  title: string
+  children: ReactNode
+  className?: string
+}) {
+  return (
+    <article className={`panel ${className}`.trim()}>
+      <h3 className="panel-title">{title}</h3>
+      <div className="panel-body">{children}</div>
+    </article>
   )
 }
 
@@ -60,28 +97,22 @@ function App() {
   const routePath = window.location.pathname
   const isKnownRoute = routePath === '/' || routePath === '/index.html'
   const [screen, setScreen] = useState<Screen>('assistant')
-  const [query, setQuery] = useState('Can room 302 have late checkout until 3pm?')
+  const [query, setQuery] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [requestError, setRequestError] = useState('')
-  const [assistantResult, setAssistantResult] = useState<AssistantResult>(DEFAULT_ASSISTANT_RESULT)
-  const [showDemoQuestions, setShowDemoQuestions] = useState(false)
-  const [hasAskedFirstQuestion, setHasAskedFirstQuestion] = useState(false)
+  const [assistantResult, setAssistantResult] = useState<AssistantResult | null>(null)
   const [health, setHealth] = useState<HealthResponse | null>(null)
-  const [selectedSopName, setSelectedSopName] = useState<string>('')
-  const [selectedSopContent, setSelectedSopContent] = useState<string>('')
+  const [selectedSopName, setSelectedSopName] = useState('')
+  const [selectedSopContent, setSelectedSopContent] = useState('')
   const [isSopLoading, setIsSopLoading] = useState(false)
   const [sopError, setSopError] = useState('')
   const queryRef = useRef<HTMLTextAreaElement | null>(null)
-
-  const focusQuery = () => {
-    queryRef.current?.focus()
-  }
 
   useEffect(() => {
     const handleShortcut = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault()
-        focusQuery()
+        queryRef.current?.focus()
       }
     }
 
@@ -125,11 +156,10 @@ function App() {
 
   const runAssistantQuery = async (question: string) => {
     const trimmed = question.trim()
-    if (!trimmed) return
+    if (!trimmed || isLoading) return
 
     setIsLoading(true)
     setRequestError('')
-    setHasAskedFirstQuestion(true)
 
     try {
       const result = await callAssistantApi(trimmed)
@@ -145,8 +175,8 @@ function App() {
     }
   }
 
-  const handleAskAssistant = async (event?: FormEvent<HTMLFormElement>) => {
-    event?.preventDefault()
+  const handleAskAssistant = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     await runAssistantQuery(query)
   }
 
@@ -193,213 +223,172 @@ function App() {
     )
   }
 
-  const isPolicyMissing = assistantResult.title === 'POLICY NOT FOUND'
+  const isPolicyMissing = assistantResult?.title === 'POLICY NOT FOUND'
   const apiOnline = health?.services.api === 'ok'
   const mcpOnline = health?.services.mcp === 'ok'
   const sopReady = health?.services.sop_index === 'ready'
   const tracingOnline = health?.services.tracing === 'ready' || health?.services.tracing === 'local'
   const tracingLabel = health?.tracing === 'langsmith' || health?.services.tracing === 'ready' ? 'LangSmith' : 'Local'
-
-  const queryPanel = (
-    <article className="panel">
-      <h3>FRONT DESK QUERY</h3>
-      <button className="demo-btn" type="button" onClick={() => setShowDemoQuestions((current) => !current)}>
-        {showDemoQuestions ? 'Hide Demo' : 'Try Demo'}
-      </button>
-      {showDemoQuestions ? (
-        <div className="demo-questions">
-          <p className="demo-philosophy">
-            Failure philosophy: if no hotel policy is found, the assistant says so rather than inventing one.
-          </p>
-          {DEMO_QUESTIONS.map((question) => (
-            <button
-              key={question}
-              type="button"
-              className="demo-question"
-              onClick={() => handleDemoQuestion(question)}
-              disabled={isLoading}
-            >
-              {question}
-            </button>
-          ))}
-        </div>
-      ) : null}
-      <form className="query-form" onSubmit={handleAskAssistant}>
-        <label className="ask-shortcut" htmlFor="front-desk-query">
-          Front desk query
-          <span>Ctrl K</span>
-        </label>
-        <textarea
-          id="front-desk-query"
-          name="query"
-          ref={queryRef}
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          rows={4}
-        />
-        {!showDemoQuestions ? (
-          <div className="example-questions">
-            <p className="example-title">TRY ASKING</p>
-            <div className="example-grid">
-              {DEMO_QUESTIONS.map((question) => (
-                <button
-                  key={`example-${question}`}
-                  type="button"
-                  className="demo-question"
-                  onClick={() => handleDemoQuestion(question)}
-                  disabled={isLoading}
-                >
-                  {question}
-                </button>
-              ))}
-            </div>
-          </div>
-        ) : null}
-        <button className="action-btn" type="submit" disabled={isLoading}>
-          {isLoading ? 'Asking...' : 'Ask Assistant'}
-        </button>
-      </form>
-      {requestError ? <p className="error-text">{requestError}</p> : null}
-    </article>
-  )
+  const healthRows: [string, string][] = [
+    ['MCP', mcpOnline ? 'ok' : 'warn'],
+    ['LangGraph', apiOnline ? 'ok' : 'warn'],
+    ['Guardrails', apiOnline ? 'ok' : 'warn'],
+    ['API', apiOnline ? 'ok' : 'warn'],
+    ['SOP Index', sopReady ? 'ok' : 'warn'],
+    ['Tracing', tracingOnline ? 'ok' : 'warn'],
+  ]
+  const screens = [
+    ['assistant', HiOutlineSparkles, 'Assistant'],
+    ['sop', HiOutlineBookOpen, 'SOP Manual'],
+    ['monitor', HiOutlineCpuChip, 'System Monitor'],
+  ] as const
 
   return (
-    <main className="app-shell">
+    <div className="app-shell">
       <header className="topbar">
-        <div className="topbar-title">MY HOTEL // OPERATIONS</div>
-        <div className="status-pill">
-          <span className={health?.status === 'ok' ? 'status-dot' : 'status-dot offline'} />
-          {health?.status === 'ok' ? 'SYSTEM ONLINE' : 'SYSTEM DEGRADED'}
+        <div className="topbar-brand">
+          <span className="brand-mark">MH</span>
+          <span>
+            MY HOTEL <i>//</i> OPERATIONS
+          </span>
+        </div>
+        <div className="system-status">
+          <span className={`dot ${health?.status === 'ok' ? '' : 'amber'}`} />
+          SYSTEM {health?.status === 'ok' ? 'ONLINE' : 'DEGRADED'}
         </div>
       </header>
 
       <div className="workspace">
         <aside className="sidebar">
-          <section>
-            <h2 className="sidebar-heading">OPERATIONS</h2>
-            <nav className="nav-list">
-              <button
-                className={screen === 'assistant' ? 'nav-item active' : 'nav-item'}
-                onClick={() => setScreen('assistant')}
-                type="button"
-              >
-                <span className="nav-item-content">
-                  <span className="nav-icon" aria-hidden="true">
-                    <HiOutlineSparkles />
-                  </span>
-                  <span>Assistant</span>
+          <div className="nav-heading">OPERATIONS</div>
+          {screens.map(([id, Icon, label]) => (
+            <button
+              className={screen === id ? 'nav-button active' : 'nav-button'}
+              key={id}
+              onClick={() => setScreen(id)}
+              type="button"
+            >
+              <Icon />
+              {label}
+            </button>
+          ))}
+          <div className="health">
+            <div className="nav-heading">SYSTEM HEALTH</div>
+            {healthRows.map(([label, status]) => (
+              <div className="health-row" key={label}>
+                <span>{label}</span>
+                <span>
+                  <b className={`dot ${status === 'warn' ? 'amber' : ''}`} />
+                  {status}
                 </span>
-              </button>
-              <button
-                className={screen === 'sop' ? 'nav-item active' : 'nav-item'}
-                onClick={() => setScreen('sop')}
-                type="button"
-              >
-                <span className="nav-item-content">
-                  <span className="nav-icon" aria-hidden="true">
-                    <HiOutlineBookOpen />
-                  </span>
-                  <span>SOP Manual</span>
-                </span>
-              </button>
-              <button
-                className={screen === 'monitor' ? 'nav-item active' : 'nav-item'}
-                onClick={() => setScreen('monitor')}
-                type="button"
-              >
-                <span className="nav-item-content">
-                  <span className="nav-icon" aria-hidden="true">
-                    <HiOutlineCpuChip />
-                  </span>
-                  <span>System Monitor</span>
-                </span>
-              </button>
-            </nav>
-          </section>
-
-          <section className="system-block">
-            <h2 className="sidebar-heading">SYSTEM</h2>
-            <ul className="health-list">
-              <li>
-                MCP <span className={mcpOnline ? 'ok' : 'warn'}>●</span>
-              </li>
-              <li>
-                LangGraph <span className={apiOnline ? 'ok' : 'warn'}>●</span>
-              </li>
-              <li>
-                Guardrails <span className={apiOnline ? 'ok' : 'warn'}>●</span>
-              </li>
-              <li>
-                API <span className={apiOnline ? 'ok' : 'warn'}>●</span>
-              </li>
-              <li>
-                SOP Index <span className={sopReady ? 'ok' : 'warn'}>●</span>
-              </li>
-              <li>
-                Tracing <span className={tracingOnline ? 'ok' : 'warn'}>●</span>
-              </li>
-            </ul>
-          </section>
+              </div>
+            ))}
+          </div>
         </aside>
 
-        <section className="content">
+        <main className="content">
           {screen === 'assistant' ? (
             <>
               <h1>AI HOSPITALITY ASSISTANT</h1>
-              <div className="assistant-top-grid">
-                {queryPanel}
-                <article className="panel">
-                  <h3>ASSISTANT RESPONSE</h3>
-                  {hasAskedFirstQuestion ? (
-                    <div className={isPolicyMissing ? 'response-box missing' : 'response-box'}>
-                      <p className={isPolicyMissing ? 'response-title missing' : 'response-title'}>
-                        {isPolicyMissing ? assistantResult.title : `✓ ${assistantResult.title}`}
-                      </p>
+              <div className="two-col">
+                <Panel title="FRONT DESK QUERY">
+                  <p className="philosophy">
+                    Ground every answer in the approved hotel SOPs. If a policy is missing, escalate rather than
+                    improvise.
+                  </p>
+                  <form onSubmit={handleAskAssistant}>
+                    <label className="field-label" htmlFor="front-desk-query">
+                      Front desk query
+                      <kbd>Ctrl K</kbd>
+                    </label>
+                    <textarea
+                      id="front-desk-query"
+                      name="query"
+                      ref={queryRef}
+                      value={query}
+                      onChange={(event) => setQuery(event.target.value)}
+                      placeholder="Ask about a hotel operations policy..."
+                      rows={4}
+                    />
+                    <div className="try-asking">
+                      <span>TRY ASKING</span>
+                      <div>
+                        {DEMO_QUESTIONS.map((question) => (
+                          <button
+                            key={question}
+                            type="button"
+                            onClick={() => handleDemoQuestion(question)}
+                            disabled={isLoading}
+                          >
+                            {question}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <button className="primary-button" type="submit" disabled={!query.trim() || isLoading}>
+                      <HiOutlinePaperAirplane />
+                      {isLoading ? 'Asking...' : 'Ask Assistant'}
+                    </button>
+                  </form>
+                  {requestError ? <p className="error-text">{requestError}</p> : null}
+                </Panel>
+
+                <Panel title="ASSISTANT RESPONSE">
+                  {assistantResult ? (
+                    <div>
+                      <div className="result-heading">
+                        <span className={isPolicyMissing ? 'warn-label' : 'ok-label'}>
+                          {isPolicyMissing ? <HiOutlineXMark /> : <HiOutlineCheck />}
+                          {assistantResult.title}
+                        </span>
+                      </div>
                       {assistantResult.response.split('\n\n').map((paragraph) => (
-                        <p key={paragraph}>{paragraph}</p>
+                        <p className="response-copy" key={paragraph}>
+                          {paragraph}
+                        </p>
                       ))}
-                      <p className="response-source">Source: {assistantResult.source}</p>
+                      <p className="source">
+                        <HiOutlineDocumentText />
+                        Source: <strong>{assistantResult.source}</strong>
+                      </p>
                     </div>
                   ) : (
                     <div className="empty-state">
-                      <p>
-                        Ask about hotel policy, procedures, VIP handling, checkout, room upgrades, or lost property.
-                      </p>
-                      <button className="action-btn" type="button" onClick={focusQuery}>
-                        Ask your first question
-                      </button>
-                      <div className="popular-queries">
-                        <p className="example-title">Popular queries</p>
-                        <div className="popular-list">
-                          {['Late checkout', 'VIP arrival', 'Lost passport', 'Room upgrade'].map((item) => (
-                            <button key={item} type="button" className="demo-question" onClick={() => setQuery(item)}>
-                              {item}
-                            </button>
-                          ))}
-                        </div>
+                      <HiOutlineSparkles />
+                      <p>Ask your first question to retrieve a grounded answer.</p>
+                      <span>POPULAR QUERIES</span>
+                      <div className="chips">
+                        {['Late checkout', 'VIP arrival', 'Lost passport', 'Room upgrade'].map((item) => (
+                          <button key={item} type="button" onClick={() => setQuery(item)}>
+                            {item}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   )}
-                </article>
+                </Panel>
               </div>
 
-              <article className="panel">
-                <h3>SOP CONTEXT</h3>
-                {hasAskedFirstQuestion ? (
-                  <div className={isPolicyMissing ? 'context-box missing' : 'context-box'}>
-                    <p className="doc-title">{assistantResult.contextDoc}</p>
+              <Panel title="SOP CONTEXT" className="full-panel">
+                {assistantResult ? (
+                  <div>
+                    <p className="doc-name">
+                      <HiOutlineDocumentText />
+                      {assistantResult.contextDoc}
+                    </p>
                     {assistantResult.contextSections.map((section) => (
-                      <p key={section}>{section}</p>
+                      <p className="response-copy" key={section}>
+                        {section}
+                      </p>
                     ))}
                   </div>
                 ) : (
-                  <p>Submit a question to view retrieved SOP sections here.</p>
+                  <p className="muted-line">Submit a question to load the relevant policy context.</p>
                 )}
-              </article>
+              </Panel>
 
-              {hasAskedFirstQuestion ? (
-                <article className="panel">
-                  <h3>ANSWER RECEIPT</h3>
+              {assistantResult ? (
+                <Panel title="ANSWER RECEIPT" className="full-panel">
                   <dl className="receipt-grid">
                     <div>
                       <dt>Request ID</dt>
@@ -418,26 +407,29 @@ function App() {
                       <dd>{assistantResult.receipt.tracing}</dd>
                     </div>
                   </dl>
-                  <p className="example-title">Retrieved documents</p>
-                  {assistantResult.receipt.retrievedDocuments.length > 0 ? (
-                    <ul className="receipt-docs">
-                      {assistantResult.receipt.retrievedDocuments.map((doc) => (
-                        <li key={doc.document}>
-                          <span className="mono">{doc.document}</span>
+                  <div className="retrieved">
+                    <span className="eyebrow">Retrieved documents</span>
+                    {assistantResult.receipt.retrievedDocuments.length > 0 ? (
+                      assistantResult.receipt.retrievedDocuments.map((doc) => (
+                        <div className="retrieved-row" key={doc.document}>
+                          <strong>{doc.document}</strong>
                           <span>
                             {doc.resource} · score {doc.score}
                           </span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p>No SOP documents were retrieved for this request.</p>
-                  )}
+                        </div>
+                      ))
+                    ) : (
+                      <p className="muted-line">No SOP documents were retrieved for this request.</p>
+                    )}
+                  </div>
                   <details className="execution-drawer">
-                    <summary>Architecture execution</summary>
+                    <summary>
+                      Architecture execution
+                      <HiOutlineChevronRight />
+                    </summary>
                     <PipelineList steps={assistantResult.pipeline} />
                   </details>
-                </article>
+                </Panel>
               ) : null}
             </>
           ) : null}
@@ -445,55 +437,67 @@ function App() {
           {screen === 'sop' ? (
             <>
               <h1>SOP MANUAL</h1>
-              <article className="panel">
-                <h3>AVAILABLE POLICIES</h3>
-                <div className="sop-list">
+              <Panel title="AVAILABLE POLICIES">
+                <div className="policy-list">
                   {SOP_DOCUMENTS.map((doc) => (
-                    <section key={doc.name} className="sop-item">
-                      <p className="doc-title">{doc.name}</p>
-                      <p>{doc.summary}</p>
-                      <button className="action-btn" type="button" onClick={() => handleOpenSopDocument(doc.name)}>
-                        {selectedSopName === doc.name && selectedSopContent && !isSopLoading
-                          ? 'Hide Full Policy'
-                          : 'View Full Policy'}
-                      </button>
-                      {selectedSopName === doc.name ? (
-                        <div className="sop-full-doc">
-                          {isSopLoading ? <p>Loading full policy document...</p> : null}
-                          {sopError ? <p className="error-text">{sopError}</p> : null}
-                          {!isSopLoading && !sopError && selectedSopContent ? (
-                            <pre className="sop-content">{selectedSopContent}</pre>
-                          ) : null}
+                    <section className="policy-card" key={doc.name}>
+                      <div className="policy-header">
+                        <div>
+                          <strong>{doc.name}</strong>
+                          <p>{doc.summary}</p>
                         </div>
+                        <button type="button" onClick={() => void handleOpenSopDocument(doc.name)}>
+                          {selectedSopName === doc.name && selectedSopContent && !isSopLoading
+                            ? 'Hide Full Policy'
+                            : 'View Full Policy'}
+                          <HiOutlineChevronDown />
+                        </button>
+                      </div>
+                      {selectedSopName === doc.name ? (
+                        <pre className="sop-content">
+                          {isSopLoading ? 'Loading full policy document...' : null}
+                          {sopError || (!isSopLoading ? selectedSopContent : '')}
+                        </pre>
                       ) : null}
                     </section>
                   ))}
                 </div>
-              </article>
+              </Panel>
             </>
           ) : null}
 
           {screen === 'monitor' ? (
             <>
               <h1>SYSTEM MONITOR</h1>
-              <article className="panel">
-                <h3>PIPELINE EXECUTION</h3>
-                {hasAskedFirstQuestion ? (
+              <Panel title="PIPELINE EXECUTION">
+                {assistantResult ? (
                   <>
                     <p className="monitor-meta">
-                      Request <span className="mono">{assistantResult.requestId}</span> · {tracingLabel} tracing
+                      Request <strong>{assistantResult.requestId}</strong> · {tracingLabel} tracing
                     </p>
                     <PipelineList steps={assistantResult.pipeline} />
                   </>
                 ) : (
-                  <p>Submit a front-desk question to inspect the per-request architecture execution.</p>
+                  <div className="empty-state">
+                    <HiOutlineChartBar />
+                    <p>Submit a front-desk question to inspect the per-request architecture execution.</p>
+                  </div>
                 )}
-              </article>
+              </Panel>
             </>
           ) : null}
-        </section>
+        </main>
       </div>
-    </main>
+
+      <footer className="health-bar">
+        {healthRows.map(([label, status]) => (
+          <span key={label}>
+            <b className={`dot ${status === 'warn' ? 'amber' : ''}`} />
+            {label} {status}
+          </span>
+        ))}
+      </footer>
+    </div>
   )
 }
 

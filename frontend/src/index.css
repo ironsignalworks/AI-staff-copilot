@@ -1,4 +1,19 @@
 :root {
+  --navy: #13253b;
+  --navy-2: #1b344e;
+  --steel: #2f6b9a;
+  --ink: #17304a;
+  --muted: #66788a;
+  --line: #cfdceb;
+  --page: #edf3f8;
+  --white: #fff;
+  --green: #116345;
+  --green-bright: #22c55e;
+  --amber: #f59e0b;
+  --rust: #9a3412;
+  --gold: #c9a227;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -10,10 +25,25 @@
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  background: #f3f5f8;
-  color: #192432;
+  background: var(--page);
+  color: var(--ink);
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 #root {
